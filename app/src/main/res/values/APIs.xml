@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="url">http://192.168.1.x:8080/</string>
+
+    <!--
+    <string name="login"></string>
+    <string name="vaccinations"></string>
+    <string name="vaccins"></string>
+    <string name="campagnes"></string>
+    <string name="addVaccination"></string>
+    -->
+
+</resources>

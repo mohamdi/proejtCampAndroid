@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddVaccination">
+
+    <EditText
+        android:id="@+id/nbrEnfants"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="#D1E5F1"
+        android:hint="Nombe d'enfants"
+        />
+
+    <Spinner
+        android:id="@+id/trancheAge"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nbrEnfants"
+        android:background="#EFF0F1"
+        />
+
+    <Spinner
+        android:id="@+id/vaccins"
+        android:layout_width="409dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="40dp"
+        android:background="#EFF0F1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trancheAge" />
+
+    <Spinner
+        android:id="@+id/moughataas"
+        android:layout_width="409dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="40dp"
+        android:background="#EFF0F1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vaccins" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginTop="40dp"
+        android:background="#EFF0F1"
+        app:layout_constraintTop_toBottomOf="@+id/moughataas"
+        tools:layout_editor_absoluteX="0dp"
+        android:id="@+id/campagne"
+        />
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:background="#5EBA7D"
+        android:text="Submit"
+        app:layout_constraintTop_toBottomOf="@+id/campagne"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:indeterminate="true"
+        android:id="@+id/loadingPanel"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

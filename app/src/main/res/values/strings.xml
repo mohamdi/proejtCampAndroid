@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ProjetCamp</string>
+
+    <string name="loginBtn">Connexion</string>
+    <string name="title_activity_vaccinations">vaccinations</string>
+    <string name="title_activity_main2">Main2Activity</string>
+</resources>
