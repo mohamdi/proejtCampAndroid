@@ -11,6 +11,7 @@ public class Campagne implements Serializable {
     private String statut;
     private Demographie demographie;
     private Collection<Vaccination> vaccinations;
+
 	public Long getId() {
 		return id;
 	}

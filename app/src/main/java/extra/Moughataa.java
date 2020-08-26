@@ -1,14 +1,28 @@
 package extra;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Collection;
 
 public class Moughataa {
 
+	@SerializedName("id")
+	@Expose
     private Long id;
+	@SerializedName("moughataaname")
+	@Expose
     private String moughataaname;
+	@SerializedName("enquetes")
+	@Expose
     private Collection<Enquete> enquetes;
+	@SerializedName("wilaya")
+	@Expose
     private Wilaya wilaya;
+	@SerializedName("vaccinations")
+	@Expose
     private Collection<Vaccination> vaccinations;
+
 	public Long getId() {
 		return id;
 	}

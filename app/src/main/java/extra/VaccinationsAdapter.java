@@ -42,7 +42,7 @@ public class VaccinationsAdapter extends RecyclerView.Adapter<VaccinationsAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Vaccination vaccination = vaccinations.get(position);
-        holder.vaccin.setText(vaccination.getVaccin());
+        holder.vaccin.setText(vaccination.getVaccin().getNom_vaccin());
         holder.date.setText(vaccination.getDate_vaccination());
         this.dBhelper = new DBhelper(this.ctx);
         this.dBhelper.openDataBase();
@@ -54,7 +54,6 @@ public class VaccinationsAdapter extends RecyclerView.Adapter<VaccinationsAdapte
                 Toast.makeText(v.getContext(), "Item :"+vaccination.getId(), Toast.LENGTH_LONG).show();
             }
         });
-
     }
 
     @Override

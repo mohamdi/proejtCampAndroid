@@ -11,6 +11,8 @@ public class AppUser {
     private boolean actived;
     private Collection<AppRole> roles=new ArrayList<>();
     private Collection<Vaccination> vaccinations;
+
+
 	public Long getId() {
 		return id;
 	}
@@ -50,5 +52,14 @@ public class AppUser {
 
 	public AppUser(Long id) {
 		this.id = id;
+	}
+
+	public AppUser(Long id, String username, String password, boolean actived, Collection<AppRole> roles, Collection<Vaccination> vaccinations) {
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.actived = actived;
+		this.roles = roles;
+		this.vaccinations = vaccinations;
 	}
 }

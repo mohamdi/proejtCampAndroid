@@ -1,5 +1,6 @@
 package com.titiit.ProjetCamp;
 
+import androidx.annotation.IntegerRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -11,16 +12,18 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.JsonReader;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,9 +33,24 @@ import extra.AppUser;
 import extra.Campagne;
 import extra.DBhelper;
 import extra.Moughataa;
+import extra.Vaccin;
 import extra.Vaccination;
+import retrofit.MoughataaService;
+import retrofit.RetroFitClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import session.Session;
+
+import static android.widget.Toast.makeText;
 
 public class AddVaccination extends AppCompatActivity {
+
+    ///////////
+    MoughataaService moughataaService;
+    ///////////
 
     Spinner vaccinsList;
     Spinner moghataasList;
@@ -54,6 +72,10 @@ public class AddVaccination extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_vaccination);
 
+        /////////
+        //getMoughataasList();
+        ////////
+
         nbreEnfant = findViewById(R.id.nbrEnfants);
         trancheAge = findViewById(R.id.trancheAge);
         vaccinsList = findViewById(R.id.vaccins);
@@ -74,9 +96,6 @@ public class AddVaccination extends AppCompatActivity {
         ArrayAdapter<String> agesAd = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, agesList);
         trancheAge.setAdapter(agesAd);
 
-        //String[] mgts = {"Arafat", "Ksar", "Teyarett", "TVZ", "Dar Naim"};
-
-
         List<String> mgts = new ArrayList<String>();
         final List<Moughataa> moughataas = dBhelper.getMoughataaList();
         for(int i=0; i<moughataas.size(); i++){
@@ -85,11 +104,14 @@ public class AddVaccination extends AppCompatActivity {
         ArrayAdapter<String> mgtsList= new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, mgts);
         moghataasList.setAdapter(mgtsList);
 
-        final String[] vaccs = {"Vaccin 1", "Vaccin 2", "Vaccin 3"};
+        List<String> vaccs = new ArrayList<String>();
+        final List<Vaccin> vaccins = dBhelper.getVaccinsList();
+        for(int i=0; i<vaccins.size(); i++){
+            vaccs.add(vaccins.get(i).getNom_vaccin());
+        }
         ArrayAdapter<String> vaccsList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, vaccs);
         vaccinsList.setAdapter(vaccsList);
 
-        //String[] camps = {"C1", "C2", "C3"};
         List<String> camps = new ArrayList<String>();
         final List<Campagne> campagnes = dBhelper.getCampagneList();
         for(int i=0; i<campagnes.size(); i++){
@@ -107,6 +129,7 @@ public class AddVaccination extends AppCompatActivity {
             public void onClick(View v) {
                 long selectedMoughataa = 0;
                 long selectedCampagne = 0;
+                long selectedVaccin = 0;
                 for(int i=0; i<campagnes.size(); i++){
                     if(campagnes.get(i).getName().equals(campagne.getSelectedItem().toString())){
                         selectedCampagne = campagnes.get(i).getId();
@@ -119,27 +142,36 @@ public class AddVaccination extends AppCompatActivity {
                         break;
                     }
                 }
+                for(int i=0; i<vaccins.size(); i++){
+                    if(vaccins.get(i).getNom_vaccin().equals(vaccinsList.getSelectedItem().toString())){
+                        selectedVaccin = vaccins.get(i).getId();
+                        break;
+                    }
+                }
 
 
                 Date date = Calendar.getInstance().getTime();
-                //
+
                 nbreEnfant.setEnabled(false);
                 trancheAge.setEnabled(false);
                 vaccinsList.setEnabled(false);
                 moghataasList.setEnabled(false);
                 submit.setEnabled(false);
                 campagne.setEnabled(false);
-                //
-                dateFormatted = date.getDate()+"/"+date.getMonth()+"/"+date.getYear();
-                vaccination = new Vaccination(dateFormatted,
+
+                dateFormatted = date.getDate()+"/"+date.getMonth()+"/"+(date.getYear()+1900);
+
+                vaccination = new Vaccination(null,
+                        dateFormatted,
                         lon,
                         lat,
-                        nbreEnfant.getText().toString(),
+                        Integer.parseInt(nbreEnfant.getText().toString()),
+                        trancheAge.getSelectedItem().toString(),
                         dBhelper.getCampagne(selectedCampagne),
                         dBhelper.getMoughataa(selectedMoughataa),
-                        new AppUser(Long.parseLong("0")),
-                        trancheAge.getSelectedItem().toString());
-                vaccination.setVaccin(vaccinsList.getSelectedItem().toString());
+                        new AppUser(Long.parseLong(getIntent().getExtras().getString("id"))),
+                        dBhelper.getVaccin(selectedVaccin)
+                );
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
                 findLocalisation();
@@ -173,44 +205,25 @@ public class AddVaccination extends AppCompatActivity {
             }
             return;
         }
-        /*Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setSpeedRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-        criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
-         */
         locationManager.requestSingleUpdate("gps", locationListener, null);
-        //locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
     }
     public void findLocalisation(){
         locationListener = new LocationListener() {
 
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                // TODO Auto-generated method stub
-
-            }
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
 
             @Override
-            public void onProviderEnabled(String provider) {
-                // TODO Auto-generated method stub
-
-            }
+            public void onProviderEnabled(String provider) {}
 
             @Override
             public void onProviderDisabled(String provider) {
-                // TODO Auto-generated method stub
                 Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(i);
             }
 
             @Override
             public void onLocationChanged(Location location) {
-                // TODO Auto-generated method stub
                 lon = location.getLatitude();
                 lat = location.getLongitude();
                 vaccination.setLongiude(lon);
@@ -226,11 +239,8 @@ public class AddVaccination extends AppCompatActivity {
 
                 findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
-                Toast.makeText(getApplicationContext(), "Date: "+dateFormatted+" \n"+
+                makeText(getApplicationContext(), "Date: "+dateFormatted+" \n"+
                         "("+vaccination.getLongiude()+","+vaccination.getLatitude()+")", Toast.LENGTH_LONG).show();
-
-                //double speed = location.getSpeed(); //spedd in meter/minute
-                //speed = (speed * 3600) / 1000;      // speed in km/minute               Toast.makeText(GraphViews.this, "Current speed:" + location.getSpeed(),Toast.LENGTH_SHORT).show();
             }
         };
         configure_button();
@@ -241,8 +251,4 @@ public class AddVaccination extends AppCompatActivity {
     }
         ///////////////////////////////////////////////////////////// Localisation end /////////////////////////////////////////////////////////////
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }
