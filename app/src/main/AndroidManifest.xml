@@ -17,16 +17,10 @@
         >
         <activity android:name=".AddVaccination" />
 
-        <service
-            android:name="extra.APIservices"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity
             android:name=".vaccinations"
             android:label="@string/title_activity_vaccinations"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Vaccinsations" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

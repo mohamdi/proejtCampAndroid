@@ -1,10 +1,6 @@
 package Synchronisation;
 
 import android.util.Log;
-import android.widget.Toast;
-
-import com.titiit.ProjetCamp.vaccinations;
-
 import java.util.List;
 
 import extra.Campagne;
