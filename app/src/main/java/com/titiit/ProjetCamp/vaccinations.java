@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,6 +22,12 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +65,12 @@ public class vaccinations extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        try {
+            this.databaseHandler("projet_campagne_vaccination.db");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         findViewById(R.id.syncPanel).setVisibility(View.INVISIBLE);
 
         dBhelper = new DBhelper(this);
@@ -83,7 +97,10 @@ public class vaccinations extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent addVac = new Intent(getApplicationContext(), AddVaccination.class);
+                addVac.putExtra("id", String.valueOf(getIntent().getStringExtra("id")));
                 startActivity(addVac);
+                finish();
+
             }
         });
 
@@ -92,15 +109,42 @@ public class vaccinations extends AppCompatActivity {
         syncBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                findViewById(R.id.syncPanel).setVisibility(View.VISIBLE);
                 Synchronisation sync = new Synchronisation(dBhelper);
-                sync.synchoniserMoughataas();
-                sync.synchoniserVaccins();
-                sync.synchroniserCampagnes();
-                sync.synchroniserVaccinations();
-                finish();
-                startActivity(getIntent());
+                try{
+                    sync.synchoniserMoughataas();
+                    sync.synchoniserVaccins();
+                    sync.synchroniserCampagnes();
+                    sync.synchroniserVaccinations();
+                    findViewById(R.id.syncPanel).setVisibility(View.GONE);
+                    finish();
+                    startActivity(getIntent());
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
         });
         ////////
+    }
+
+    private void databaseHandler(String dbname) throws IOException {
+        if(!this.getDatabasePath(dbname).exists()){
+            // Open your local db as the input stream
+            InputStream myInput = this.getAssets().open(dbname);
+            // Path to the just created empty db
+            File outFileName = this.getDatabasePath(dbname);
+            // Open the empty db as the output stream
+            OutputStream myOutput = new FileOutputStream(outFileName);
+            // transfer bytes from the inputfile to the outputfile
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = myInput.read(buffer)) > 0) {
+                myOutput.write(buffer, 0, length);
+            }
+            // Close the streams
+            myOutput.flush();
+            myOutput.close();
+            myInput.close();
+        }
     }
 }

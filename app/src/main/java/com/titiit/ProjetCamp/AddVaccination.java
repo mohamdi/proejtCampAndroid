@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -59,10 +60,6 @@ public class AddVaccination extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_vaccination);
-
-        /////////
-        //getMoughataasList();
-        ////////
 
         nbreEnfant = findViewById(R.id.nbrEnfants);
         trancheAge = findViewById(R.id.trancheAge);
@@ -161,7 +158,6 @@ public class AddVaccination extends AppCompatActivity {
                         dBhelper.getVaccin(selectedVaccin)
                 );
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-
                 findLocalisation();
             }
         });
@@ -226,9 +222,8 @@ public class AddVaccination extends AppCompatActivity {
                 campagne.setEnabled(true);
 
                 findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-
-                makeText(getApplicationContext(), "Date: "+dateFormatted+" \n"+
-                        "("+vaccination.getLongiude()+","+vaccination.getLatitude()+")", Toast.LENGTH_LONG).show();
+                finish();
+                startActivity(new Intent(getApplicationContext(), vaccinations.class));
             }
         };
         configure_button();
