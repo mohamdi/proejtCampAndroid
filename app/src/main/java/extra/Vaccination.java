@@ -20,13 +20,13 @@ public class Vaccination implements Serializable {
 	@SerializedName("latitude")
 	@Expose
 	private double latitude;
-	@SerializedName("inombre_enfantd")
+	@SerializedName("nombre_enfant")
 	@Expose
 	private Integer nombre_enfant;
 	@SerializedName("tranche_age")
 	@Expose
 	private String tranche_age;
-	@SerializedName("icampagned")
+	@SerializedName("campagne")
 	@Expose
 	private Campagne campagne;
 	@SerializedName("moughataa")

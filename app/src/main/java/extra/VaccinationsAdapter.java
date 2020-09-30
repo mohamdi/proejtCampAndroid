@@ -51,7 +51,7 @@ public class VaccinationsAdapter extends RecyclerView.Adapter<VaccinationsAdapte
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), "Item :"+vaccination.getId(), Toast.LENGTH_LONG).show();
+                Toast.makeText(v.getContext(), "enfants :"+vaccination.getNombre_enfant(), Toast.LENGTH_LONG).show();
             }
         });
     }

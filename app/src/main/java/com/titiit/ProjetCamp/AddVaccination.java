@@ -136,14 +136,6 @@ public class AddVaccination extends AppCompatActivity {
 
 
                 Date date = Calendar.getInstance().getTime();
-
-                nbreEnfant.setEnabled(false);
-                trancheAge.setEnabled(false);
-                vaccinsList.setEnabled(false);
-                moghataasList.setEnabled(false);
-                submit.setEnabled(false);
-                campagne.setEnabled(false);
-
                 dateFormatted = date.getDate()+"/"+date.getMonth()+"/"+(date.getYear()+1900);
 
                 vaccination = new Vaccination(null,
@@ -157,6 +149,12 @@ public class AddVaccination extends AppCompatActivity {
                         new AppUser(Long.parseLong(getIntent().getExtras().getString("id"))),
                         dBhelper.getVaccin(selectedVaccin)
                 );
+                nbreEnfant.setEnabled(false);
+                trancheAge.setEnabled(false);
+                vaccinsList.setEnabled(false);
+                moghataasList.setEnabled(false);
+                submit.setEnabled(false);
+                campagne.setEnabled(false);
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
                 findLocalisation();
             }
@@ -208,8 +206,8 @@ public class AddVaccination extends AppCompatActivity {
 
             @Override
             public void onLocationChanged(Location location) {
-                lon = location.getLatitude();
-                lat = location.getLongitude();
+                lat = location.getLatitude();
+                lon = location.getLongitude();
                 vaccination.setLongiude(lon);
                 vaccination.setLatitude(lat);
 
