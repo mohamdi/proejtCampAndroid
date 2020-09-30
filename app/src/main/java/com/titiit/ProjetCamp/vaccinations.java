@@ -1,61 +1,34 @@
 package com.titiit.ProjetCamp;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import Synchronisation.Synchronisation;
-import extra.Campagne;
 import extra.DBhelper;
-import extra.Moughataa;
-import extra.Vaccin;
 import extra.Vaccination;
 import extra.VaccinationsAdapter;
-import retrofit.CampagneService;
-import retrofit.MoughataaService;
-import retrofit.VaccinService;
-import retrofit.VaccinationService;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class vaccinations extends AppCompatActivity {
 
     RecyclerView vaccinationsRecycleView;
     VaccinationsAdapter vaccinsAdapter;
     List<Vaccination> vaccinsList;
-    LayoutInflater inflater;
     DBhelper dBhelper;
-
     Button syncBtn;
 
     @Override
@@ -100,7 +73,6 @@ public class vaccinations extends AppCompatActivity {
                 addVac.putExtra("id", String.valueOf(getIntent().getStringExtra("id")));
                 startActivity(addVac);
                 finish();
-
             }
         });
 
@@ -116,12 +88,12 @@ public class vaccinations extends AppCompatActivity {
                     sync.synchoniserVaccins();
                     sync.synchroniserCampagnes();
                     sync.synchroniserVaccinations();
-                    findViewById(R.id.syncPanel).setVisibility(View.GONE);
-                    finish();
-                    startActivity(getIntent());
                 }catch (Exception e){
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
+                findViewById(R.id.syncPanel).setVisibility(View.GONE);
+                finish();
+                startActivity(getIntent());
             }
         });
         ////////
