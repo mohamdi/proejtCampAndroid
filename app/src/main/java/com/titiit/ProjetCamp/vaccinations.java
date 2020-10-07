@@ -84,10 +84,17 @@ public class vaccinations extends AppCompatActivity {
                 findViewById(R.id.syncPanel).setVisibility(View.VISIBLE);
                 Synchronisation sync = new Synchronisation(dBhelper);
                 try{
+                    sync.synchoniserWilayas();
                     sync.synchoniserMoughataas();
-                    sync.synchoniserVaccins();
                     sync.synchroniserCampagnes();
+<<<<<<< HEAD
+                    sync.synchoniserVaccins();
+                    if(vaccinsList.size()>0){
+                        sync.synchroniserVaccinations();
+                    }
+=======
                     sync.synchroniserVaccinations();
+>>>>>>> df32dc151bb336856dd26a80c40a0c39f793004e
                 }catch (Exception e){
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }

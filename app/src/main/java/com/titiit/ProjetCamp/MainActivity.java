@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("http://192.168.1.13:8080/agent/")
+                        .baseUrl("http://192.168.1.6:8080/agent/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
                 AuthService authService = retrofit.create(AuthService.class);
