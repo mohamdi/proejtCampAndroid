@@ -27,30 +27,6 @@ public class DBhelper extends SQLiteOpenHelper {
         this.context = ctx;
     }
 
-    public Vaccination getVaccination(Long id){
-        Vaccination vac = null;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cur = db.rawQuery("SELECT * FROM vaccination WHERE id = "+id+" ;", null);
-        if(cur!=null){
-            if(cur.moveToNext()){
-                vac = new Vaccination(null,
-                    cur.getString(cur.getColumnIndex("date_vaccination")),
-                    cur.getDouble(cur.getColumnIndex("longiude")),
-                    cur.getDouble(cur.getColumnIndex("latitude")),
-                    cur.getInt(cur.getColumnIndex("nombre_enfant")),
-                    cur.getString(cur.getColumnIndex("tranche_age")),
-                    this.getCampagne(cur.getLong(cur.getColumnIndex("campagne"))),
-                    this.getMoughataa(cur.getLong(cur.getColumnIndex("moughataa"))),
-                    new AppUser(cur.getLong(cur.getColumnIndex("user"))),
-                    this.getVaccin(cur.getLong(cur.getColumnIndex("vaccin")))
-                    );
-            }
-        }
-        cur.close();
-        db.close();
-        return vac;
-    }
-
     public List<Vaccination> getVaccinationList(){
         List<Vaccination> vaccinationList = new ArrayList<Vaccination>();
         Vaccination vac = null;
@@ -129,6 +105,35 @@ public class DBhelper extends SQLiteOpenHelper {
         return moughataa;
     }
 
+    public Moughataa getMoughataByNameAndWilaya(String name, Long idWilaya){
+        Moughataa moughataa = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM Moughataa WHERE moughataaname = '"+name+"' AND wilaya_id =  "+idWilaya+";", null);
+        if(curs!=null){
+            if(curs.moveToNext()){
+                moughataa = new Moughataa(curs.getLong(curs.getColumnIndex("id")), curs.getString(curs.getColumnIndex("moughataaname")));
+            }
+        }
+        curs.close();
+        db.close();
+        return moughataa;
+    }
+
+    public List<Moughataa> getMoughtaasByWilaya(Long idWilaya){
+        List<Moughataa> moughataaList = new ArrayList<Moughataa>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM Moughataa WHERE wilaya_id = "+idWilaya+";", null);
+        if(curs!=null){
+            Moughataa moughataa = new Moughataa();
+            while(curs.moveToNext()){
+                moughataaList.add(new Moughataa(curs.getLong(curs.getColumnIndex("id")), curs.getString(curs.getColumnIndex("moughataaname"))));
+            }
+        }
+        curs.close();
+        db.close();
+        return moughataaList;
+    }
+
     public List<Moughataa> getMoughataaList(){
         List<Moughataa> moughataaList = new ArrayList<Moughataa>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -149,9 +154,70 @@ public class DBhelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
             db.execSQL(
-                    "INSERT INTO Moughataa (id, moughataaname) VALUES ("+
+                    "INSERT INTO Moughataa (id, moughataaname, wilaya_id) VALUES ("+
                     moughataa.getId()+", '"+
-                    moughataa.getMoughataaname()+"');"
+                    moughataa.getMoughataaname()+"'," +
+                    moughataa.getWilaya().getId()+");"
+            );
+            added = true;
+        } catch (Exception e){
+            Log.d("[-] Error moughataa: ", e.getMessage());
+        }
+        db.close();
+        return added;
+    }
+
+    public Wilaya getWilaya(Long id){
+        Wilaya wilaya = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM wilaya WHERE id = "+id+" ;", null);
+        if(curs!=null){
+            if(curs.moveToNext()){
+                wilaya = new Wilaya(curs.getLong(curs.getColumnIndex("id")), curs.getString(curs.getColumnIndex("name")));
+            }
+        }
+        curs.close();
+        db.close();
+        return wilaya;
+    }
+
+    public Wilaya getWilayaByName(String name){
+        Wilaya wilaya = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM wilaya WHERE name = '"+name+"' ;", null);
+        if(curs!=null){
+            if(curs.moveToNext()){
+                wilaya = new Wilaya(curs.getLong(curs.getColumnIndex("id")), curs.getString(curs.getColumnIndex("name")));
+            }
+        }
+        curs.close();
+        db.close();
+        return wilaya;
+    }
+
+    public List<Wilaya> getWilayaList(){
+        List<Wilaya> wilayaList = new ArrayList<Wilaya>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor curs = db.rawQuery("SELECT * FROM wilaya ;", null);
+        if(curs!=null){
+            Moughataa moughataa = new Moughataa();
+            while(curs.moveToNext()){
+                wilayaList.add(new Wilaya(curs.getLong(curs.getColumnIndex("id")), curs.getString(curs.getColumnIndex("name"))));
+            }
+        }
+        curs.close();
+        db.close();
+        return wilayaList;
+    }
+
+    public boolean addWilaya(Wilaya wilaya){
+        boolean added = false;
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.execSQL(
+                    "INSERT INTO wilaya (id, name) VALUES ("+
+                            wilaya.getId()+", '"+
+                            wilaya.getName()+"');"
             );
             added = true;
         } catch (Exception e){
@@ -321,9 +387,46 @@ public class DBhelper extends SQLiteOpenHelper {
 
     }
 
+    ///// Synchroniser les wilayas
+    public void synWilayas(List<Wilaya> newWilayas){
+        List<Wilaya> wilayas = this.getWilayaList();
+        if(wilayas.size()==0){
+            for(Wilaya wil : newWilayas){
+                this.addWilaya(wil);
+            }
+            return;
+        }
+        if(wilayas.size()==newWilayas.size()){
+            return;
+        }else{
+            if(newWilayas.size()>wilayas.size()){
+                int i = 0;
+                for(i=0;i<newWilayas.size();i++){
+                    boolean match = false;
+                    int j=0;
+                    for(j=0;j<wilayas.size();j++){
+                        if(newWilayas.get(i).getName().equals(wilayas.get(j).getName())){
+                            match = true;
+                            break;
+                        }
+                        if(!match){
+                            this.addWilaya(new Wilaya(null, newWilayas.get(i).getName()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     ////Synchroniser les moughataas
     public void synMoughtaas(List<Moughataa> newMoughataas){
         List<Moughataa> mgts = this.getMoughataaList();
+        if(mgts.size()==0){
+            for(Moughataa mgt : newMoughataas){
+                this.addMoughataa(mgt);
+            }
+            return;
+        }
         if(mgts.size()==newMoughataas.size()){
             return;
         }else{
@@ -349,6 +452,12 @@ public class DBhelper extends SQLiteOpenHelper {
     ////Synchroniser les vaccins
     public void synVaccins(List<Vaccin> newVaccins){
         List<Vaccin> vaccins = this.getVaccinsList();
+        if(vaccins.size()==0){
+            for(Vaccin vac : newVaccins){
+                this.addVaccin(vac);
+            }
+            return;
+        }
         if(vaccins.size()==newVaccins.size()){
             return;
         }else{
@@ -374,6 +483,12 @@ public class DBhelper extends SQLiteOpenHelper {
     ////Synchroniser les campagnes
     public void synCampagnes(List<Campagne> newCampagnes) {
         List<Campagne> campagnes = this.getCampagneList();
+        if(campagnes.size()==0){
+            for(Campagne camp : newCampagnes){
+                this.addCampagne(camp);
+            }
+            return;
+        }
         if(campagnes.size()==newCampagnes.size()){
             return;
         }else{

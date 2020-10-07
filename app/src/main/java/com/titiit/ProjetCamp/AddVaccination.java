@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +32,7 @@ import extra.DBhelper;
 import extra.Moughataa;
 import extra.Vaccin;
 import extra.Vaccination;
+import extra.Wilaya;
 import retrofit.MoughataaService;
 
 import static android.widget.Toast.makeText;
@@ -42,12 +44,18 @@ public class AddVaccination extends AppCompatActivity {
     ///////////
 
     Spinner vaccinsList;
+    Spinner wilayasList;
     Spinner moghataasList;
     EditText nbreEnfant;
     Spinner trancheAge;
     Button submit;
     Spinner campagne;
     DBhelper dBhelper;
+    long selectedMoughataa = 0;
+    long selectedCampagne = 0;
+    long selectedVaccin = 0;
+    long selectedWilaya = 0;
+    String selctedMoughataaName = "";
 
     //Localisation
     LocationManager locationManager;
@@ -65,8 +73,10 @@ public class AddVaccination extends AppCompatActivity {
         trancheAge = findViewById(R.id.trancheAge);
         vaccinsList = findViewById(R.id.vaccins);
         moghataasList = findViewById(R.id.moughataas);
+        wilayasList = findViewById(R.id.wilayas);
         submit = findViewById(R.id.btnSubmit);
         campagne = findViewById(R.id.campagne);
+
 
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
@@ -81,13 +91,49 @@ public class AddVaccination extends AppCompatActivity {
         ArrayAdapter<String> agesAd = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, agesList);
         trancheAge.setAdapter(agesAd);
 
-        List<String> mgts = new ArrayList<String>();
-        final List<Moughataa> moughataas = dBhelper.getMoughataaList();
-        for(int i=0; i<moughataas.size(); i++){
-            mgts.add(moughataas.get(i).getMoughataaname());
+        List<String> wils = new ArrayList<String>();
+        final List<Wilaya> wilayas = dBhelper.getWilayaList();
+        for(int i=0; i<wilayas.size(); i++){
+            wils.add(wilayas.get(i).getName());
         }
-        ArrayAdapter<String> mgtsList= new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, mgts);
-        moghataasList.setAdapter(mgtsList);
+        ArrayAdapter<String> wilsList= new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, wils);
+        wilayasList.setAdapter(wilsList);
+        wilayasList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedWilaya = dBhelper.getWilayaByName(wilayasList.getSelectedItem().toString()).getId();
+                final List<Moughataa> moughataas = dBhelper.getMoughtaasByWilaya(selectedWilaya);
+                List<String> mgts = new ArrayList<String>();
+                for(int i=0; i<moughataas.size(); i++){
+                    mgts.add(moughataas.get(i).getMoughataaname());
+                    ArrayAdapter<String> mgtsList= new ArrayAdapter<String>(parent.getContext(), android.R.layout.simple_spinner_dropdown_item, mgts);
+                    moghataasList.setAdapter(mgtsList);
+                    moghataasList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            selectedMoughataa = dBhelper.getMoughataByNameAndWilaya(moghataasList.getSelectedItem().toString(), selectedWilaya).getId();
+                            for(int i=0; i<moughataas.size(); i++){
+                                if(moughataas.get(i).getMoughataaname().equals(moghataasList.getSelectedItem().toString())){
+                                    selectedMoughataa = moughataas.get(i).getId();
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         List<String> vaccs = new ArrayList<String>();
         final List<Vaccin> vaccins = dBhelper.getVaccinsList();
@@ -107,23 +153,14 @@ public class AddVaccination extends AppCompatActivity {
 
         dBhelper.close();
 
-        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
         this.submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                long selectedMoughataa = 0;
-                long selectedCampagne = 0;
-                long selectedVaccin = 0;
                 for(int i=0; i<campagnes.size(); i++){
                     if(campagnes.get(i).getName().equals(campagne.getSelectedItem().toString())){
                         selectedCampagne = campagnes.get(i).getId();
-                        break;
-                    }
-                }
-                for(int i=0; i<moughataas.size(); i++){
-                    if(moughataas.get(i).getMoughataaname().equals(moghataasList.getSelectedItem().toString())){
-                        selectedMoughataa = moughataas.get(i).getId();
                         break;
                     }
                 }
@@ -136,14 +173,6 @@ public class AddVaccination extends AppCompatActivity {
 
 
                 Date date = Calendar.getInstance().getTime();
-
-                nbreEnfant.setEnabled(false);
-                trancheAge.setEnabled(false);
-                vaccinsList.setEnabled(false);
-                moghataasList.setEnabled(false);
-                submit.setEnabled(false);
-                campagne.setEnabled(false);
-
                 dateFormatted = date.getDate()+"/"+date.getMonth()+"/"+(date.getYear()+1900);
 
                 vaccination = new Vaccination(null,
@@ -157,6 +186,13 @@ public class AddVaccination extends AppCompatActivity {
                         new AppUser(Long.parseLong(getIntent().getExtras().getString("id"))),
                         dBhelper.getVaccin(selectedVaccin)
                 );
+                nbreEnfant.setEnabled(false);
+                trancheAge.setEnabled(false);
+                vaccinsList.setEnabled(false);
+                moghataasList.setEnabled(false);
+                wilayasList.setEnabled(false);
+                submit.setEnabled(false);
+                campagne.setEnabled(false);
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
                 findLocalisation();
             }
@@ -208,8 +244,8 @@ public class AddVaccination extends AppCompatActivity {
 
             @Override
             public void onLocationChanged(Location location) {
-                lon = location.getLatitude();
-                lat = location.getLongitude();
+                lat = location.getLatitude();
+                lon = location.getLongitude();
                 vaccination.setLongiude(lon);
                 vaccination.setLatitude(lat);
 
@@ -218,6 +254,7 @@ public class AddVaccination extends AppCompatActivity {
                 trancheAge.setEnabled(true);
                 vaccinsList.setEnabled(true);
                 moghataasList.setEnabled(true);
+                wilayasList.setEnabled(true);
                 submit.setEnabled(true);
                 campagne.setEnabled(true);
 

@@ -25,4 +25,9 @@ public class Wilaya {
 	public void setMoughataas(Collection<Moughataa> moughataas) {
 		this.moughataas = moughataas;
 	}
+
+	public Wilaya(Long id, String name){
+		this.id = id;
+		this.name = name;
+	}
 }

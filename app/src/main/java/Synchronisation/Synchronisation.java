@@ -8,10 +8,12 @@ import extra.DBhelper;
 import extra.Moughataa;
 import extra.Vaccin;
 import extra.Vaccination;
+import extra.Wilaya;
 import retrofit.CampagneService;
 import retrofit.MoughataaService;
 import retrofit.VaccinService;
 import retrofit.VaccinationService;
+import retrofit.WilayaService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -20,7 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Synchronisation {
 
-    String URL = "http://192.168.1.13:8080/agent/";
+    String URL = "http://192.168.1.6:8080/agent/";
 
     public DBhelper dBhelper;
 
@@ -51,6 +53,31 @@ public class Synchronisation {
                 Log.e("ERROR MOUGHATAAS ", t.getMessage());
             }
         });
+    }
+
+    public void synchoniserWilayas(){
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            WilayaService wilayaService = retrofit.create(WilayaService.class);
+            Call<List<Wilaya>> call = wilayaService.getWilayas();
+            call.enqueue(new Callback<List<Wilaya>>() {
+                @Override
+                public void onResponse(Call<List<Wilaya>> call, Response<List<Wilaya>> response) {
+                    if(response.isSuccessful()){
+                        List<Wilaya> list = response.body();
+                        dBhelper.synWilayas(list);
+                    }else{
+                        Log.i("REPONSE ERR MOUGHATAAS", response.errorBody().toString());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Wilaya>> call, Throwable t) {
+                    Log.e("ERROR MOUGHATAAS ", t.getMessage());
+                }
+            });
     }
 
     public void synchoniserVaccins(){
