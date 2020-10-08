@@ -190,10 +190,7 @@ public class AddVaccination extends AppCompatActivity {
                 trancheAge.setEnabled(false);
                 vaccinsList.setEnabled(false);
                 moghataasList.setEnabled(false);
-<<<<<<< HEAD
                 wilayasList.setEnabled(false);
-=======
->>>>>>> df32dc151bb336856dd26a80c40a0c39f793004e
                 submit.setEnabled(false);
                 campagne.setEnabled(false);
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
@@ -231,6 +228,8 @@ public class AddVaccination extends AppCompatActivity {
         locationManager.requestSingleUpdate("gps", locationListener, null);
     }
     public void findLocalisation(){
+        Log.e("wilaya[!]: ", selectedWilaya+"");
+        Log.e("moughataa[!]: ", selectedMoughataa+"");
         locationListener = new LocationListener() {
 
             @Override
@@ -249,6 +248,10 @@ public class AddVaccination extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 lat = location.getLatitude();
                 lon = location.getLongitude();
+
+                Log.e("longitude [+] : ", lon+"");
+                Log.e("latitude [+] : ", lat+"");
+
                 vaccination.setLongiude(lon);
                 vaccination.setLatitude(lat);
 
