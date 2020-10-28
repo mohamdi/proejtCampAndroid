@@ -91,6 +91,7 @@ public class vaccinations extends AppCompatActivity {
                     if(vaccinsList.size()>0){
                         sync.synchroniserVaccinations();
                     }
+                    sync.synchroniserVaccinations();
                 }catch (Exception e){
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }

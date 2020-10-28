@@ -22,7 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Synchronisation {
 
-    String URL = "http://192.168.1.6:8080/agent/";
+    String URL = "http://192.168.1.3:8080/agent/";
 
     public DBhelper dBhelper;
 

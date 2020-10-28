@@ -173,7 +173,7 @@ public class AddVaccination extends AppCompatActivity {
 
 
                 Date date = Calendar.getInstance().getTime();
-                dateFormatted = date.getDate()+"/"+date.getMonth()+"/"+(date.getYear()+1900);
+                dateFormatted = date.getDate()+"/"+date.getMonth()+1+"/"+(date.getYear()+1900);
 
                 vaccination = new Vaccination(null,
                         dateFormatted,
@@ -228,6 +228,8 @@ public class AddVaccination extends AppCompatActivity {
         locationManager.requestSingleUpdate("gps", locationListener, null);
     }
     public void findLocalisation(){
+        Log.e("wilaya[!]: ", selectedWilaya+"");
+        Log.e("moughataa[!]: ", selectedMoughataa+"");
         locationListener = new LocationListener() {
 
             @Override
@@ -246,6 +248,10 @@ public class AddVaccination extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 lat = location.getLatitude();
                 lon = location.getLongitude();
+
+                Log.e("longitude [+] : ", lon+"");
+                Log.e("latitude [+] : ", lat+"");
+
                 vaccination.setLongiude(lon);
                 vaccination.setLatitude(lat);
 

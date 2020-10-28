@@ -198,13 +198,12 @@
             android:text="Submit"
             app:layout_constraintTop_toBottomOf="@+id/containerCampagnes"
             tools:layout_editor_absoluteX="0dp" />
-
-        <ProgressBar
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:indeterminate="true"
-            android:id="@+id/loadingPanel"
-            />
         </LinearLayout>
     </ScrollView>
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:indeterminate="true"
+        android:id="@+id/loadingPanel"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
