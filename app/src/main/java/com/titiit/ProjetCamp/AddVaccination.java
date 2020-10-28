@@ -173,7 +173,7 @@ public class AddVaccination extends AppCompatActivity {
 
 
                 Date date = Calendar.getInstance().getTime();
-                dateFormatted = date.getDate()+"/"+date.getMonth()+1+"/"+(date.getYear()+1900);
+                dateFormatted = date.getDate()+"/"+(date.getMonth()+1)+"/"+(date.getYear()+1900);
 
                 vaccination = new Vaccination(null,
                         dateFormatted,
